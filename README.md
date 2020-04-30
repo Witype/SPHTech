@@ -18,8 +18,16 @@
   - [x] Dagger2+MVP+RETROFIT+OKHTTP+RXJAVA+RXANDROID
   - [ ] Activity&Presenter LifeCycle管理
   - [ ] 页面基础加载、提示
-  - [ ] 接口请求结构化、非结构化数据处理
+  - [ ] 接口结构化、非结构化数据处理
 - [ ] 页面开发
+  - [ ] 列表页面
+  - [ ] 弹窗图标
+- [ ] 测试
+  - [ ] 逻辑代码单元测试
+  - [ ] UI即兼容测试
+  - [ ] 老化测试
+  - [ ] 安全测试
+- [ ] 测试报告
 
 ## 
 * **Email**: <witype716@qq.com>  
