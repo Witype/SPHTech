@@ -12,6 +12,7 @@
 6. [`Okhttp`](https://github.com/square/okhttp)
 7. [`Butterknife`](https://github.com/JakeWharton/butterknife)
 8.  [`Timber`](https://github.com/JakeWharton/timber)
+9.  [`RxCache`](https://github.com/VictorAlbertos/RxCache)
 
 ## TO LIST
 - [ ]  基础框架
@@ -24,11 +25,9 @@
   - [x] 显示可点击的图片
   - [x] 数据缓存，在没有网络的情况下缓存30分钟
 - [ ] 测试
-  - [ ] 逻辑代码单元测试
-  - [ ] UI即兼容测试
+  - [x] 核心逻辑代码单元测试。ps：各个框架都有相应的单元测试用例，因此第三方库忽略测试
+  - [x] UI即兼容测试
   - [ ] 老化测试
-  - [ ] 安全测试
-- [ ] 测试报告
 
 ## 
 * **Email**: <witype716@qq.com>  
