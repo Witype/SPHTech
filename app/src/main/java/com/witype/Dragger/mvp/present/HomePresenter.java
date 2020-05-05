@@ -5,8 +5,10 @@ import android.util.Log;
 import com.witype.Dragger.entity.MobileDateUsageEntity;
 import com.witype.Dragger.entity.RecordsBean;
 import com.witype.Dragger.integration.scope.ActivityScope;
+import com.witype.Dragger.mvp.activity.QuarterAdapter;
 import com.witype.Dragger.mvp.contract.HomeView;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,6 +19,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -34,6 +37,9 @@ public class HomePresenter extends BasePresenter<HomeView> {
     private int startQuarter = DEFAULT_START_YEAR, endQuarter = DEFAULT_END_YEAR;
 
     @Inject
+    QuarterAdapter quarterAdapter;
+
+    @Inject
     public HomePresenter(HomeView view) {
         super(view);
     }
@@ -47,6 +53,7 @@ public class HomePresenter extends BasePresenter<HomeView> {
     }
 
     public void getMobileDataUsage(int limit) {
+        showLoading();
         model.getMobileDataUsage(RESOURCE_ID, limit)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<MobileDateUsageEntity>() {
@@ -59,6 +66,8 @@ public class HomePresenter extends BasePresenter<HomeView> {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         throwable.printStackTrace();
+                        dismissLoading();
+                        view.onGetDataError(throwable.getMessage());
                     }
                 });
     }
@@ -69,26 +78,36 @@ public class HomePresenter extends BasePresenter<HomeView> {
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(Schedulers.single())
                 .flatMap(new DataGroupFun(startQuarter, endQuarter))
+                .flatMap(new DataQuarterOffsetFun())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<RecordsBean>>() {
                     @Override
                     public void accept(List<RecordsBean> recordsBeans) throws Exception {
-
+                        quarterAdapter.addData(recordsBeans);
+                        dismissLoading();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         throwable.printStackTrace();
+                        dismissLoading();
+                        view.onGetDataError(throwable.getMessage());
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        quarterAdapter.notifyDataSetChanged();
                     }
                 });
     }
 
-    private int getQuarterFilter(String quarter) {
-        Pattern pattern = Pattern.compile("20[0-9]{2}");
-        Matcher matcher = pattern.matcher(quarter);
-        return matcher.find() ? Integer.parseInt(matcher.group(0)) : 0;
-    }
-
+    /**
+     * 将数据按照年进行分组，
+     * 使用RxJava
+     * groupBy      @see #http://reactivex.io/documentation/operators/groupby.html
+     * toSortedList @see #http://reactivex.io/documentation/operators/to.html
+     * flatMap      @see #http://reactivex.io/documentation/operators/flatmap.html
+     */
     public static class DataGroupFun implements Function<List<RecordsBean>, ObservableSource<List<RecordsBean>>> {
 
         private int startAt, endAt;
@@ -159,21 +178,47 @@ public class HomePresenter extends BasePresenter<HomeView> {
         }
     }
 
+    /**
+     *计算年度自己与上一个季度的差值和去年的综合
+     * scale    @see http://reactivex.io/documentation/operators/scan.html
+     */
     public static class DataQuarterOffsetFun implements Function<List<RecordsBean>, ObservableSource<List<RecordsBean>>> {
+
+        private BigDecimal total;
 
         @Override
         public ObservableSource<List<RecordsBean>> apply(List<RecordsBean> recordsBeans) throws Exception {
+            total = new BigDecimal(0.0);
             return Observable.fromIterable(recordsBeans)
+                    .doOnNext(new Consumer<RecordsBean>() {
+                        @Override
+                        public void accept(RecordsBean recordsBean) throws Exception {
+                            recordsBean.getQuarterQStr();
+                            recordsBean.getQuarterYStr();
+                            total = total.add(new BigDecimal(Double.toString(recordsBean.getVolume_of_mobile_data())));
+                        }
+                    })
                     .scan(new BiFunction<RecordsBean, RecordsBean, RecordsBean>() {
                         @Override
                         public RecordsBean apply(RecordsBean recordsBean, RecordsBean recordsBean2) throws Exception {
-                            double offset = recordsBean2.getVolume_of_mobile_data() - recordsBean.getVolume_of_mobile_data();
+                            double offset = new BigDecimal(Double.toString(recordsBean2.getVolume_of_mobile_data())).subtract(new BigDecimal(Double.toString(recordsBean.getVolume_of_mobile_data()))).doubleValue();
                             recordsBean2.setVolume_offset(offset);
+//                            double result = new BigDecimal(Double.toString(recordsBean.getVolume_of_mobile_data())).add(new BigDecimal(recordsBean2.getVolume_of_mobile_data())).doubleValue();
+//                            recordsBean2.setVolume(result);
                             return recordsBean2;
                         }
                     })
                     .toList()
-                    .toObservable();
+                    .toObservable()
+                    .doOnNext(new Consumer<List<RecordsBean>>() {
+                        @Override
+                        public void accept(List<RecordsBean> recordsBeans) throws Exception {
+                            for (RecordsBean recordsBean : recordsBeans) {
+                                recordsBean.setTotal_of_year(total.doubleValue());
+                            }
+                        }
+                    });
         }
     }
+
 }

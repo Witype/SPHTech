@@ -6,6 +6,8 @@ public interface IBaseView {
 
     void showToast(String message);
 
+    void showToast(int resId);
+
     void showLoading(String message);
 
     void showLoading();

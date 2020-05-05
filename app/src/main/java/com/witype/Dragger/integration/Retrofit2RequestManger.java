@@ -1,8 +1,8 @@
 package com.witype.Dragger.integration;
 
 import com.witype.Dragger.BuildConfig;
-import com.witype.Dragger.integration.fastjson.FastJsonConverterFactory;
 
+import java.io.File;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -11,10 +11,13 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import io.reactivex.annotations.NonNull;
+import io.rx_cache2.internal.RxCache;
+import io.victoralbertos.jolyglot.GsonSpeaker;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Retrofit2RequestManger implements IRequestManager {
 
@@ -26,9 +29,12 @@ public class Retrofit2RequestManger implements IRequestManager {
 
     private Retrofit mRetrofit;
 
+    RxCache rxCache;
+
     @Inject
     public Retrofit2RequestManger() {
         mRetrofit = provideRetrofit(getRetrofitBuilder(), provideClient(getOkHttpClientBuilder()));
+        rxCache = new RxCache.Builder().persistence(new File(FileManager.getInstance().getFileCacheDir()), new GsonSpeaker());
     }
 
     @Override
@@ -37,11 +43,16 @@ public class Retrofit2RequestManger implements IRequestManager {
         return mRetrofit.create(tClass);
     }
 
+    @NonNull
+    public synchronized <T> T createCache(Class<T> tClass) {
+        return rxCache.using(tClass);
+    }
+
     private Retrofit provideRetrofit(Retrofit.Builder retrofitBuild, OkHttpClient okHttpClient) {
         return retrofitBuild.baseUrl(BASE_URL)
                 .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(FastJsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
 

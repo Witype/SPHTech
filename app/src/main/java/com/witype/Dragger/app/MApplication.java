@@ -5,6 +5,7 @@ import android.app.Application;
 import com.witype.Dragger.BuildConfig;
 import com.witype.Dragger.di.component.AppComponent;
 import com.witype.Dragger.di.component.DaggerAppComponent;
+import com.witype.Dragger.integration.FileManager;
 
 import timber.log.Timber;
 
@@ -28,5 +29,6 @@ public class MApplication extends Application {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+        FileManager.newInstance(this);
     }
 }

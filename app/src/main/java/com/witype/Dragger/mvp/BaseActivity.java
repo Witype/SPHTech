@@ -3,10 +3,6 @@ package com.witype.Dragger.mvp;
 import android.app.Activity;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.witype.Dragger.app.MApplication;
 import com.witype.Dragger.di.component.AppComponent;
 import com.witype.Dragger.mvp.contract.IBaseView;
@@ -14,15 +10,24 @@ import com.witype.Dragger.mvp.present.IBasePresenter;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 public abstract class BaseActivity<P extends IBasePresenter> extends AppCompatActivity implements IBaseView {
 
     @Inject
     P presenter;
 
+    private Unbinder bind;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupComponent(((MApplication) getApplication()).getAppComponent());
+        setContentView(getResId());
         initView();
         if (presenter != null) {
             presenter.onStart();
@@ -30,8 +35,10 @@ public abstract class BaseActivity<P extends IBasePresenter> extends AppCompatAc
         initData();
     }
 
-    protected void initView() {
+    public abstract int getResId();
 
+    public void initView() {
+        ButterKnife.bind(this);
     }
 
     protected void initData() {
@@ -66,6 +73,11 @@ public abstract class BaseActivity<P extends IBasePresenter> extends AppCompatAc
     }
 
     @Override
+    public void showToast(int resId) {
+        showToast(getString(resId));
+    }
+
+    @Override
     public Activity getActivity() {
         return this;
     }
@@ -75,6 +87,9 @@ public abstract class BaseActivity<P extends IBasePresenter> extends AppCompatAc
         super.onDestroy();
         if (presenter != null) {
             presenter.onDestroy();
+        }
+        if (bind != null) {
+            bind.unbind();
         }
     }
 }

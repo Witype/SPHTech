@@ -19,10 +19,11 @@ public class CallDataModel {
     }
 
     public Observable<MobileDateUsageEntity> getMobileDataUsage(String resourceId, int limit) {
-        return requestManager.create(ApiModel.class)
-                .getMobileDataUsage(resourceId, limit)
-                .observeOn(Schedulers.io())
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io());
+        return requestManager.createCache(CacheCallModel.class)
+                .getMobileDataUsage(requestManager.create(ApiModel.class)
+                        .getMobileDataUsage(resourceId, limit)
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(Schedulers.io())
+                        .unsubscribeOn(Schedulers.io()));
     }
 }

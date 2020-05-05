@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Data Usage</string>
+    <string name="tip_quarter"> </string>
+    <string name="label_tip_total_of_year">total: %s</string>
+    <string name="label_data_usage">usage: %s</string>
+    <string name="label_increase">up/down: %s</string>
+    <string name="tip_occurred">An error occurred</string>
+    <string name="dialog_case_retry">retry</string>
 </resources>

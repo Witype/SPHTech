@@ -1,5 +1,6 @@
 package com.witype.Dragger.di.component;
 
+import com.witype.Dragger.di.module.HomeModule;
 import com.witype.Dragger.integration.scope.ActivityScope;
 import com.witype.Dragger.mvp.activity.MainActivity;
 import com.witype.Dragger.mvp.contract.HomeView;
@@ -8,7 +9,7 @@ import dagger.BindsInstance;
 import dagger.Component;
 
 @ActivityScope
-@Component(dependencies = AppComponent.class)
+@Component(modules = {HomeModule.class} ,dependencies = AppComponent.class)
 public interface HomeComponent {
 
     void inject(MainActivity mainActivity);

@@ -1,5 +1,7 @@
 package com.witype.Dragger.di.module;
 
+import android.app.Application;
+
 import com.witype.Dragger.integration.CallDataModel;
 import com.witype.Dragger.integration.IRequestManager;
 import com.witype.Dragger.integration.Retrofit2RequestManger;
@@ -14,11 +16,11 @@ import dagger.Provides;
 public abstract class ClientModule {
 
     @Binds
-    abstract IRequestManager bindRepositoryManager(Retrofit2RequestManger repositoryManager);
+    abstract IRequestManager bindRepositoryManager(Retrofit2RequestManger retrofit2RequestManger);
 
     @Singleton
     @Provides
-    static CallDataModel provideModel() {
+    static CallDataModel provideModel(Application application) {
         return new CallDataModel();
     }
 

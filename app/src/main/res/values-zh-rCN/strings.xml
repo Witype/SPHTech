@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Data Usage</string>
+    <string name="tip_quarter">季度</string>
+    <string name="label_tip_total_of_year">总： %s</string>
+    <string name="label_data_usage">用量： %s</string>
+    <string name="label_increase">增长： %s</string>
+    <string name="tip_occurred">数据获取异常</string>
+    <string name="dialog_case_retry">重试</string>
+</resources>

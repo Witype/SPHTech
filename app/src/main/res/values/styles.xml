@@ -6,6 +6,28 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="background">@color/colorBg</item>
     </style>
+
+    <style name="ItemQuarterTitle">
+        <item name="android:textSize">@dimen/text_size_quarter_primary</item>
+        <item name="android:textColor">@color/primary_text</item>
+    </style>
+
+    <style name="ItemQuarterSubTitle">
+        <item name="android:textSize">@dimen/text_size_quarter_secondary</item>
+        <item name="android:textColor">@color/secondary_text</item>
+    </style>
+
+    <style name="ItemPrimaryUp">
+        <item name="android:textSize">@dimen/text_size_quarter_secondary</item>
+        <item name="android:textColor">@color/data_usage_up</item>
+    </style>
+
+    <style name="ItemPrimaryDown">
+        <item name="android:textSize">@dimen/text_size_quarter_primary</item>
+        <item name="android:textColor">@color/data_usage_down</item>
+    </style>
+
 
 </resources>
