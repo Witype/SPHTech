@@ -16,6 +16,6 @@ import io.rx_cache2.LifeCache;
  */
 public interface ICacheRequestModel {
 
-    @LifeCache(duration = 5, timeUnit = TimeUnit.MINUTES)
+    @LifeCache(duration = 30, timeUnit = TimeUnit.MINUTES)
     Observable<MobileDateUsageEntity> getMobileDataUsage(Observable<MobileDateUsageEntity> response);
 }
