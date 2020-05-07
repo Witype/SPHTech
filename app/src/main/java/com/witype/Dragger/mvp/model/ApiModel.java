@@ -9,6 +9,5 @@ import retrofit2.http.Query;
 public interface ApiModel {
 
     @GET(Api.datastoreSearch)
-
     Observable<MobileDateUsageEntity> getMobileDataUsage(@Query("resource_id") String resourceId, @Query("limit") int limit);
 }

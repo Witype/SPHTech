@@ -4,5 +4,7 @@ public interface IBasePresenter {
 
     void onStart();
 
+    void onStop();
+
     void onDestroy();
 }

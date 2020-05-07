@@ -3,6 +3,7 @@ package com.witype.Dragger.mvp;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 import com.witype.Dragger.app.MApplication;
 import com.witype.Dragger.di.component.AppComponent;
 import com.witype.Dragger.mvp.contract.IBaseView;
@@ -12,11 +13,10 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public abstract class BaseActivity<P extends IBasePresenter> extends AppCompatActivity implements IBaseView {
+public abstract class BaseActivity<P extends IBasePresenter> extends RxAppCompatActivity implements IBaseView {
 
     @Inject
     P presenter;
@@ -38,7 +38,7 @@ public abstract class BaseActivity<P extends IBasePresenter> extends AppCompatAc
     public abstract int getResId();
 
     public void initView() {
-        ButterKnife.bind(this);
+        bind = ButterKnife.bind(this);
     }
 
     protected void initData() {
@@ -80,6 +80,14 @@ public abstract class BaseActivity<P extends IBasePresenter> extends AppCompatAc
     @Override
     public Activity getActivity() {
         return this;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (presenter != null) {
+            presenter.onStop();
+        }
     }
 
     @Override

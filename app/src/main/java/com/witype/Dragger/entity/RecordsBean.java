@@ -30,16 +30,16 @@ public class RecordsBean implements CompareAble {
         this.quarter = quarter;
     }
 
-    public double getVolume() {
-        return volume <= 0 ? getVolume_of_mobile_data() : volume;
+    public String getVolume() {
+        return volume <= 0 ? getVolume_of_mobile_data() : String.valueOf(volume);
     }
 
     public void setVolume(double volume) {
         this.volume = volume;
     }
 
-    public double getVolume_of_mobile_data() {
-        return volume_of_mobile_data;
+    public String getVolume_of_mobile_data() {
+        return String.valueOf(volume_of_mobile_data);
     }
 
     public void setVolume_of_mobile_data(double volume_of_mobile_data) {

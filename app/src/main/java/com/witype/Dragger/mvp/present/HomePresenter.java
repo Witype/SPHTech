@@ -1,9 +1,9 @@
 package com.witype.Dragger.mvp.present;
 
-import android.util.Log;
-
+import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.witype.Dragger.entity.MobileDateUsageEntity;
 import com.witype.Dragger.entity.RecordsBean;
+import com.witype.Dragger.integration.HttpObserver;
 import com.witype.Dragger.integration.scope.ActivityScope;
 import com.witype.Dragger.mvp.activity.QuarterAdapter;
 import com.witype.Dragger.mvp.contract.HomeView;
@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -53,49 +52,36 @@ public class HomePresenter extends BasePresenter<HomeView> {
     }
 
     public void getMobileDataUsage(int limit) {
-        showLoading();
         model.getMobileDataUsage(RESOURCE_ID, limit)
+                //需要和ActivityEvent绑定，这样在Activity销毁时能够取消订阅
+                .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<MobileDateUsageEntity>() {
-                    @Override
-                    public void accept(MobileDateUsageEntity mobileDateUsageEntity) throws Exception {
-                        Log.d("", "getMobileDataUsage");
-                        onGetData(mobileDateUsageEntity.getResult().getRecords());
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
-                        dismissLoading();
-                        view.onGetDataError(throwable.getMessage());
-                    }
-                });
-    }
-
-    private void onGetData(List<RecordsBean> recordsBeans) {
-        Observable.just(recordsBeans)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
+                .compose(bindUIEvent())
                 .observeOn(Schedulers.single())
+                .map(new Function<MobileDateUsageEntity, List<RecordsBean>>() {
+                    @Override
+                    public List<RecordsBean> apply(MobileDateUsageEntity mobileDateUsageEntity) throws Exception {
+                        return mobileDateUsageEntity.getResult().getRecords();
+                    }
+                })
                 .flatMap(new DataGroupFun(startQuarter, endQuarter))
                 .flatMap(new DataQuarterOffsetFun())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<RecordsBean>>() {
+                .subscribe(new HttpObserver<List<RecordsBean>>() {
                     @Override
-                    public void accept(List<RecordsBean> recordsBeans) throws Exception {
+                    public void onSuccess(List<RecordsBean> recordsBeans) {
                         quarterAdapter.addData(recordsBeans);
-                        dismissLoading();
                     }
-                }, new Consumer<Throwable>() {
+
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
-                        dismissLoading();
-                        view.onGetDataError(throwable.getMessage());
+                    public void onHttpError(String message, int httpCode) {
+                        super.onHttpError(message, httpCode);
+                        view.onGetDataError(message);
                     }
-                }, new Action() {
+
                     @Override
-                    public void run() throws Exception {
+                    public void onComplete() {
+                        super.onComplete();
                         quarterAdapter.notifyDataSetChanged();
                     }
                 });
@@ -150,7 +136,7 @@ public class HomePresenter extends BasePresenter<HomeView> {
                     .toSortedList(new Comparator<List<RecordsBean>>() {
                         @Override
                         public int compare(List<RecordsBean> recordsBeans, List<RecordsBean> t1) {
-                            return recordsBeans.get(0).getCompareKey().compareTo(t1.get(0).getCompareKey());
+                            return ascCompare(recordsBeans.get(0),t1.get(0));
                         }
                     })
                     .toObservable()
@@ -167,7 +153,7 @@ public class HomePresenter extends BasePresenter<HomeView> {
 
             @Override
             public int compare(RecordsBean recordsBean, RecordsBean t1) {
-                return recordsBean.getCompareKey().compareTo(t1.getCompareKey());
+                return ascCompare(recordsBean,t1);
             }
         };
 
@@ -176,6 +162,10 @@ public class HomePresenter extends BasePresenter<HomeView> {
             Matcher matcher = pattern.matcher(quarter);
             return matcher.find() ? Integer.parseInt(matcher.group(0)) : 0;
         }
+    }
+
+    private static int ascCompare(RecordsBean recordsBean, RecordsBean t1) {
+        return recordsBean.getCompareKey().compareTo(t1.getCompareKey());
     }
 
     /**
@@ -195,13 +185,13 @@ public class HomePresenter extends BasePresenter<HomeView> {
                         public void accept(RecordsBean recordsBean) throws Exception {
                             recordsBean.getQuarterQStr();
                             recordsBean.getQuarterYStr();
-                            total = total.add(new BigDecimal(Double.toString(recordsBean.getVolume_of_mobile_data())));
+                            total = total.add(new BigDecimal(recordsBean.getVolume_of_mobile_data()));
                         }
                     })
                     .scan(new BiFunction<RecordsBean, RecordsBean, RecordsBean>() {
                         @Override
                         public RecordsBean apply(RecordsBean recordsBean, RecordsBean recordsBean2) throws Exception {
-                            double offset = new BigDecimal(Double.toString(recordsBean2.getVolume_of_mobile_data())).subtract(new BigDecimal(Double.toString(recordsBean.getVolume_of_mobile_data()))).doubleValue();
+                            double offset = new BigDecimal(recordsBean2.getVolume_of_mobile_data()).subtract(new BigDecimal(recordsBean.getVolume_of_mobile_data())).doubleValue();
                             recordsBean2.setVolume_offset(offset);
 //                            double result = new BigDecimal(Double.toString(recordsBean.getVolume_of_mobile_data())).add(new BigDecimal(recordsBean2.getVolume_of_mobile_data())).doubleValue();
 //                            recordsBean2.setVolume(result);

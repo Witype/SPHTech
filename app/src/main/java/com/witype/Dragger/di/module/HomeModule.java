@@ -1,7 +1,10 @@
 package com.witype.Dragger.di.module;
 
+import com.witype.Dragger.integration.CallDataModel;
 import com.witype.Dragger.integration.scope.ActivityScope;
 import com.witype.Dragger.mvp.activity.QuarterAdapter;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -19,5 +22,4 @@ public class HomeModule {
     QuarterAdapter provideAdapter() {
         return new QuarterAdapter();
     }
-
 }

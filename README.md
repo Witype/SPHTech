@@ -17,9 +17,9 @@
 ## TO LIST
 - [ ]  基础框架
   - [x] Dagger2+MVP+RETROFIT+OKHTTP+RXJAVA+RXANDROID
-  - [ ] Activity&Presenter LifeCycle管理
+  - [x] Activity&Presenter LifeCycle管理
   - [x] 页面基础加载、提示
-  - [ ] 接口结构化、非结构化数据处理
+  - [x] 接口结构化、非结构化数据处理
 - [ ] 页面开发
   - [x] 显示列表数据
   - [x] 显示可点击的图片
@@ -27,7 +27,14 @@
 - [ ] 测试
   - [x] 核心逻辑代码单元测试。ps：各个框架都有相应的单元测试用例，因此第三方库忽略测试
   - [x] UI即兼容测试
+  - [x] 薪资RxJava模块单元测试用例
   - [ ] 老化测试
+
+## 特点
+1. 相较于google的mvp框架，此框架只需要定义一个CallModel即可全局使用，而google需要定义很多的constract，如果各个模块之间存在公用的model则需要重新定义，比较麻烦。
+2. 另外，presenter不单单只是适用于Activity，可以适用于多种情况，service、工具类，和activity定义使用一样简单
+3. 灵活的处理结构化与非结构化数据，配合不同的compose、function，灵活切换
+4. dagger2在此框架非常重要，对开发者apt、java基础能力要求较高，但是如果只是开发则非常容易。
 
 ## 
 * **Email**: <witype716@qq.com>  

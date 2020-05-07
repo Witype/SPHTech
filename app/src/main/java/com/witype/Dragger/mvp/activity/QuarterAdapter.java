@@ -67,7 +67,7 @@ public class QuarterAdapter extends RecyclerView.Adapter<QuarterAdapter.DataUsag
             holder.quarterTotal.setText(String.format(context.getString(R.string.label_tip_total_of_year),String.valueOf(recordsBean.getTotal_of_year())));
             holder.quarter.setText(recordsBean.getQuarterQStr());
             holder.relative.setText(String.format(context.getString(R.string.label_increase),String.valueOf(recordsBean.getVolume_offset())));
-            holder.usage.setText(String.valueOf(recordsBean.getVolume()));
+            holder.usage.setText(recordsBean.getVolume());
             holder.view.setVisibility(recordsBean.getVolume_offset() < 0 ? View.VISIBLE : View.INVISIBLE);
             holder.content.setVisibility(isFirstQuarterOfYear(recordsBean.getQuarterQStr()) ? View.VISIBLE : View.GONE);
             if (recordsBean.getVolume_offset() < 0) {
