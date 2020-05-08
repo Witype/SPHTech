@@ -6,7 +6,7 @@
 ## 功能和依赖库
 1. [`RxJava2`](https://github.com/ReactiveX/RxJava)
 2. [`RxAndroid2`](https://github.com/ReactiveX/RxAndroid)
-3. [`Mvp` Google's official` Mvp` architecture project (this is the Dagger branch).](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/)
+3. [`Mvp` Google's official` Mvp` Dagger2案例.](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/)
 4. [`Dagger2`](https://github.com/google/dagger)
 5. [`Retrofit`](https://github.com/square/retrofit)
 6. [`Okhttp`](https://github.com/square/okhttp)
