@@ -4,13 +4,12 @@ import com.witype.Dragger.RxJavaRule;
 import com.witype.Dragger.entity.MobileDateUsageEntity;
 import com.witype.Dragger.entity.RecordsBean;
 import com.witype.Dragger.entity.ResultBean;
-import com.witype.Dragger.integration.CallDataModel;
+import com.witype.Dragger.integration.HttpModel;
 import com.witype.Dragger.integration.HttpObserver;
-import com.witype.Dragger.integration.Retrofit2RequestManger;
 import com.witype.Dragger.integration.UIObservableTransformer;
 import com.witype.Dragger.mvp.contract.HomeView;
-import com.witype.Dragger.mvp.contract.ICacheRequestModel;
 import com.witype.Dragger.mvp.model.ApiModel;
+import com.witype.mvp.integration.RetrofitRequestManager;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -23,17 +22,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.TestObserver;
-import io.reactivex.schedulers.Schedulers;
 import io.rx_cache2.internal.RxCache;
 import io.victoralbertos.jolyglot.GsonSpeaker;
 import okhttp3.OkHttpClient;
@@ -65,10 +61,10 @@ public class HomePresenterTest {
     @Before
     public void setUp() throws Exception {
         HomeView homeView = Mockito.mock(HomeView.class);
-        CallDataModel callDataModel = Mockito.mock(CallDataModel.class);
+        HttpModel httpModel = Mockito.mock(HttpModel.class);
 
         Mockito.doReturn(homeView).when(homePresenter).getView();
-        Mockito.doReturn(callDataModel).when(homePresenter).getModel();
+        Mockito.doReturn(httpModel).when(homePresenter).getModel();
 
         random = new Random();
         mData = new ArrayList<>();
@@ -255,9 +251,10 @@ public class HomePresenterTest {
         }
         log("|\t rxCache path : " + file.getAbsoluteFile());
         RxCache persistence = new RxCache.Builder().persistence(new File(file.getPath()), new GsonSpeaker());
-        Retrofit2RequestManger requestManger = new Retrofit2RequestManger(retrofit,persistence);
+        RetrofitRequestManager requestManger = new RetrofitRequestManager(retrofit,persistence);
 
-        CallDataModel callDataModel = new CallDataModel(requestManger);
+        HttpModel httpModel = Mockito.mock(HttpModel.class);
+        Mockito.when(httpModel.getRequestManager()).thenReturn(requestManger);
 
         HttpObserver<List<RecordsBean>> httpObserver = new HttpObserver<List<RecordsBean>>() {
             @Override
@@ -287,7 +284,7 @@ public class HomePresenterTest {
         };
         TestObserver<List<RecordsBean>> testObserver = new TestObserver<List<RecordsBean>>(httpObserver);
 
-        callDataModel.getMobileDataUsage(HomePresenter.RESOURCE_ID, LIMIT)
+        httpModel.getMobileDataUsage(HomePresenter.RESOURCE_ID, LIMIT)
                 .doOnNext(new Consumer<MobileDateUsageEntity>() {
                     @Override
                     public void accept(MobileDateUsageEntity mobileDateUsageEntity) throws Exception {

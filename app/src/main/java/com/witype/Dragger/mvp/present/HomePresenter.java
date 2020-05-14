@@ -4,9 +4,9 @@ import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.witype.Dragger.entity.MobileDateUsageEntity;
 import com.witype.Dragger.entity.RecordsBean;
 import com.witype.Dragger.integration.HttpObserver;
-import com.witype.Dragger.integration.scope.ActivityScope;
 import com.witype.Dragger.mvp.activity.QuarterAdapter;
 import com.witype.Dragger.mvp.contract.HomeView;
+import com.witype.mvp.integration.scope.ActivityScope;
 
 import java.math.BigDecimal;
 import java.util.Comparator;

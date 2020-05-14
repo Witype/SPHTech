@@ -8,21 +8,13 @@ import androidx.annotation.Nullable;
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.RxLifecycle;
 import com.trello.rxlifecycle3.android.ActivityEvent;
-import com.witype.Dragger.integration.CallDataModel;
+import com.witype.Dragger.integration.HttpModel;
 import com.witype.Dragger.integration.UIObservableTransformer;
 import com.witype.Dragger.mvp.contract.IBaseView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
@@ -39,8 +31,8 @@ public class BasePresenter<V> implements IBasePresenter, IBaseView {
 
     private UIObservableTransformer observableTransformer;
 
-    @Inject
-    CallDataModel model;
+//    @Inject
+    HttpModel model;
 
     public BasePresenter(V view) {
         this.view = view;
@@ -50,7 +42,7 @@ public class BasePresenter<V> implements IBasePresenter, IBaseView {
         return view;
     }
 
-    public CallDataModel getModel() {
+    public HttpModel getModel() {
         return model;
     }
 
