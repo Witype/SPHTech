@@ -1,7 +1,6 @@
 package com.witype.Dragger.mvp.activity;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,13 +62,13 @@ public class QuarterAdapter extends RecyclerView.Adapter<QuarterAdapter.DataUsag
         RecordsBean recordsBean = getItem(position);
         Context context = holder.content.getContext();
         if (recordsBean != null) {
-            holder.year.setText(recordsBean.getQuarterYStr());
+            holder.year.setText(String.valueOf(recordsBean.getQuarterYearNum()));
             holder.quarterTotal.setText(String.format(context.getString(R.string.label_tip_total_of_year),String.valueOf(recordsBean.getTotal_of_year())));
-            holder.quarter.setText(recordsBean.getQuarterQStr());
+            holder.quarter.setText(String.format("Q%s",recordsBean.getQuarterQuaterNum()));
             holder.relative.setText(String.format(context.getString(R.string.label_increase),String.valueOf(recordsBean.getVolume_offset())));
-            holder.usage.setText(recordsBean.getVolume());
+            holder.usage.setText(String.valueOf(recordsBean.getVolume_of_mobile_data()));
             holder.view.setVisibility(recordsBean.getVolume_offset() < 0 ? View.VISIBLE : View.INVISIBLE);
-            holder.content.setVisibility(isFirstQuarterOfYear(recordsBean.getQuarterQStr()) ? View.VISIBLE : View.GONE);
+            holder.content.setVisibility(isFirstQuarterOfYear(recordsBean.getQuarterQuaterNum()) ? View.VISIBLE : View.GONE);
             if (recordsBean.getVolume_offset() < 0) {
                 holder.relative.setTextColor(ContextCompat.getColor(context,R.color.data_usage_down));
             } else {
@@ -87,8 +86,8 @@ public class QuarterAdapter extends RecyclerView.Adapter<QuarterAdapter.DataUsag
         return recordsBeans == null || recordsBeans.size() < position ? null : recordsBeans.get(position);
     }
 
-    private boolean isFirstQuarterOfYear(String recordsBean) {
-        return TextUtils.equals(recordsBean,"Q1");
+    private boolean isFirstQuarterOfYear(int recordsBean) {
+        return recordsBean == 1;
     }
 
     public static class DataUsageHolder extends RecyclerView.ViewHolder {

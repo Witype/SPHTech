@@ -7,6 +7,7 @@ import com.witype.Dragger.di.component.AppComponent;
 import com.witype.Dragger.di.component.DaggerAppComponent;
 import com.witype.Dragger.di.module.ConfigModule;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.HttpUrl;

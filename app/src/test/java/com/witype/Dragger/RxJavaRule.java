@@ -4,20 +4,16 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import java.util.concurrent.TimeUnit;
-
 import io.reactivex.Scheduler;
 import io.reactivex.functions.Function;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.schedulers.TestScheduler;
 
-public class RxSchedulerRule implements TestRule {
+public class RxJavaRule implements TestRule {
 
-    private TestScheduler testScheduler = new TestScheduler();
 
     @Override
-    public Statement apply(Statement base, Description description) {
+    public Statement apply(final Statement base, Description description) {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
@@ -50,5 +46,4 @@ public class RxSchedulerRule implements TestRule {
             }
         };
     }
-
 }

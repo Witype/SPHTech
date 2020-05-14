@@ -13,6 +13,9 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -36,6 +39,12 @@ public abstract class BaseActivity<P extends IBasePresenter> extends RxAppCompat
     }
 
     public abstract int getResId();
+
+    @NonNull
+    @Override
+    public Lifecycle getLifecycle() {
+        return super.getLifecycle();
+    }
 
     public void initView() {
         bind = ButterKnife.bind(this);

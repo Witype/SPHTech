@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Binds;
@@ -33,13 +34,20 @@ public abstract class ClientModule {
 
     @Singleton
     @Provides
-    static RxCache provideRxCache(Application application) {
-        return new RxCache.Builder().persistence(application.getCacheDir(), new GsonSpeaker());
+    public static RxCache provideRxCache(@Named("cache") File application) {
+        return new RxCache.Builder().persistence(application, new GsonSpeaker());
     }
 
     @Singleton
     @Provides
-    static Retrofit provideRetrofit(HttpUrl url, OkHttpClient okHttpClient, ConfigModule.RetrofitConfig retrofitConfig) {
+    @Named("cache")
+    public static File provideRxCacheFile(Application application) {
+        return application.getCacheDir();
+    }
+
+    @Singleton
+    @Provides
+    public static Retrofit provideRetrofit(HttpUrl url, OkHttpClient okHttpClient, ConfigModule.RetrofitConfig retrofitConfig) {
         Retrofit.Builder retrofitBuild = new Retrofit.Builder().baseUrl(url)
                 .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create());
@@ -51,7 +59,7 @@ public abstract class ClientModule {
 
     @Singleton
     @Provides
-    static OkHttpClient provideOkHttpClient(ConfigModule.OkHttpConfig okHttpConfig,ThreadPoolExecutor httpExecutor) {
+    public static OkHttpClient provideOkHttpClient(ConfigModule.OkHttpConfig okHttpConfig,ThreadPoolExecutor httpExecutor) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .dispatcher(new Dispatcher(httpExecutor));
         if (okHttpConfig != null) {
@@ -62,7 +70,7 @@ public abstract class ClientModule {
 
     @Singleton
     @Provides
-    static ThreadPoolExecutor provideThreadPoolExecutor() {
+    public static ThreadPoolExecutor provideThreadPoolExecutor() {
         ThreadFactory threadFactory = runnable -> {
             Thread result = new Thread(runnable, "http");
             result.setDaemon(false);

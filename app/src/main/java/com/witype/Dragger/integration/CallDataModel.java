@@ -12,20 +12,25 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CallDataModel implements IRequestModel {
 
-    @Inject
     IRequestManager requestManager;
 
     @Inject
-    public CallDataModel() {
+    public CallDataModel(IRequestManager requestManager) {
+        this.requestManager = requestManager;
     }
 
     @Override
     public Observable<MobileDateUsageEntity> getMobileDataUsage(String resourceId, int limit) {
-        return requestManager.createCache(ICacheRequestModel.class)
-                .getMobileDataUsage(requestManager.create(ApiModel.class)
+        return getRequestManager().createCache(ICacheRequestModel.class)
+                .getMobileDataUsage(getRequestManager().create(ApiModel.class)
                         .getMobileDataUsage(resourceId, limit)
                         .observeOn(Schedulers.io())
                         .subscribeOn(Schedulers.io())
-                        .unsubscribeOn(Schedulers.io()));
+                        .unsubscribeOn(Schedulers.io())
+                );
+    }
+
+    public IRequestManager getRequestManager() {
+        return requestManager;
     }
 }

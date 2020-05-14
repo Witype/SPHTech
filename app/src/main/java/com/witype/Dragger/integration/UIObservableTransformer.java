@@ -19,8 +19,7 @@ public abstract class UIObservableTransformer<T> implements ObservableTransforme
     public ObservableSource<T> apply(Observable<T> upstream) {
         return upstream
                 .doOnSubscribe(disposable -> hasSubscribe())
-                .doOnError(throwable -> willComplete())
-                .doOnComplete(this::willComplete);
+                .doFinally(this::willComplete);
     }
 
     /**
