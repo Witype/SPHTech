@@ -78,8 +78,6 @@ public class HomePresenterTest {
             year = i % 4 == 0 ? random.nextInt(2000) : year;
         }
 
-        Observable just1 = Observable.just(1);
-
         // mock
         Observable<MobileDateUsageEntity> just = Observable.just(mobileDateUsageEntity);
         ResultBean resultBean = Mockito.mock(ResultBean.class);
@@ -226,120 +224,6 @@ public class HomePresenterTest {
         log("\t└────────────────────────────────────────────────────────────");
 
         log("└────────────────────────────────────────────────────");
-    }
-
-    /**
-     * 测试{@link ApiModel#getMobileDataUsage(String, int)}https://data.gov.sg获取数据，
-     * see <a>https://data.gov.sg/api/action/datastore_search?resource_id=a807b7ab-6cad-4aa6-87d0-e283a7353a0f&limit=5</a>
-     * flatmap测试查看
-     * DataRangeFilter {@link com.witype.Dragger.mvp.present.HomePresenter.DataRangeFilter}
-     * DataGroupFun {@link com.witype.Dragger.mvp.present.HomePresenter.DataGroupFun}
-     * DataQuarterOffsetFun {@link com.witype.Dragger.mvp.present.HomePresenter.DataQuarterOffsetFun}
-     */
-    @Test
-    public void testGetRemoteDataSuccessWithHttpObserver() {
-        log("┌─── test testGetRemoteDataSuccessWithHttpObserver ─────────────────────────────────");
-        int startAt = 2008,endAt = 2018;
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://data.gov.sg")
-                .client(new OkHttpClient.Builder().build())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        File file = new File("cache");
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        log("|\t rxCache path : " + file.getAbsoluteFile());
-        RxCache persistence = new RxCache.Builder().persistence(new File(file.getPath()), new GsonSpeaker());
-        RetrofitRequestManager requestManger = new RetrofitRequestManager(retrofit,persistence);
-
-        HttpModel httpModel = Mockito.mock(HttpModel.class);
-        Mockito.when(httpModel.getRequestManager()).thenReturn(requestManger);
-
-        HttpObserver<List<RecordsBean>> httpObserver = new HttpObserver<List<RecordsBean>>() {
-            @Override
-            public void onSuccess(List<RecordsBean> recordsBeans) {
-                log(String.format("|\t┌─── after filter %s──────────────────────────────────────────────────", recordsBeans.size()));
-                for (RecordsBean recordsBean : recordsBeans) {
-                    log(String.format("|\t| %s", recordsBean.toString()));
-                    assertThat(recordsBean.getQuarterYearNum(), Matchers.lessThanOrEqualTo(endAt));
-                    assertThat(recordsBean.getQuarterYearNum(), Matchers.greaterThanOrEqualTo(startAt));
-                }
-                log("|\t└───────────────────────────────────────────────────────────");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                super.onError(e);
-                log("|\t call onError => onGetDataError");
-                homePresenter.getView().onGetDataError(e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-                super.onComplete();
-                log("|\t call onComplete => onGetMobileDataUsage");
-                homePresenter.getView().onGetMobileDataUsage();
-            }
-        };
-        TestObserver<List<RecordsBean>> testObserver = new TestObserver<List<RecordsBean>>(httpObserver);
-
-        httpModel.getMobileDataUsage(HomePresenter.RESOURCE_ID, LIMIT)
-                .doOnNext(new Consumer<MobileDateUsageEntity>() {
-                    @Override
-                    public void accept(MobileDateUsageEntity mobileDateUsageEntity) throws Exception {
-                        log("|\t┌─── response ────────────────────────────────────────────────");
-                        log("|\t" + mobileDateUsageEntity.toString());
-                        log("|\t└────────────────────────────────────────────────────────────");
-                        log(String.format("|\t┌─── input item %s ────────────────────────────────────────────────",mobileDateUsageEntity.getResult().getRecords().size()));
-                        for (RecordsBean record : mobileDateUsageEntity.getResult().getRecords()) {
-                            log("|\t| " + record.toString());
-                        }
-                        log("|\t└────────────────────────────────────────────────────────────");
-                    }
-                })
-                .compose(new UIObservableTransformer<MobileDateUsageEntity>() {
-                    @Override
-                    public void hasSubscribe() {
-                        log("|\t call hasSubscribe => showLoading");
-                        homePresenter.getView().showLoading();
-                    }
-
-                    @Override
-                    public void willComplete() {
-                        log("|\t call willComplete => dismissLoading");
-                        homePresenter.getView().dismissLoading();
-                    }
-                })
-                .map(new Function<MobileDateUsageEntity, List<RecordsBean>>() {
-                    @Override
-                    public List<RecordsBean> apply(MobileDateUsageEntity mobileDateUsageEntity) throws Exception {
-                        return mobileDateUsageEntity.getResult().getRecords();
-                    }
-                })
-                .flatMap(new HomePresenter.DataRangeFilter(startAt,endAt))
-                .flatMap(new HomePresenter.DataGroupFun())
-                .flatMap(new HomePresenter.DataQuarterOffsetFun())
-                .subscribe(testObserver);
-        testObserver.assertNoErrors();
-
-        InOrder inOrder = Mockito.inOrder(homePresenter.getView());
-        log("|\t┌─── assert ────────────────────────────────────────────────");
-        log("|\t▊ assert order showLoading => onGetMobileDataUsage => dismissLoading");
-        inOrder.verify(homePresenter.getView()).showLoading();
-        inOrder.verify(homePresenter.getView()).onGetMobileDataUsage();
-        inOrder.verify(homePresenter.getView()).dismissLoading();
-
-        log("|\t▊ assert call");
-        log("|\t| assert HomeView#showLoading atMostOnce call");
-        Mockito.verify(homePresenter.getView(),Mockito.atMostOnce()).showLoading();
-        log("|\t| assert HomeView#onGetMobileDataUsage atMostOnce call");
-        Mockito.verify(homePresenter.getView(),Mockito.atMostOnce()).onGetMobileDataUsage();
-        log("|\t| assert HomeView#dismissLoading atMostOnce call");
-        Mockito.verify(homePresenter.getView(),Mockito.atMostOnce()).dismissLoading();
-        log("\t└────────────────────────────────────────────────────────────");
-
-        log("└────────────────────────────────────────────────────────────");
     }
 
     /**

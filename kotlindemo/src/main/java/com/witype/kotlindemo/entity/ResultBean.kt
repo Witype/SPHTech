@@ -1,6 +1,6 @@
 package com.witype.kotlindemo.entity
 
-class ResultBean {
+open class ResultBean {
     /**
      * fields : [{"id":"_id","type":"int4"},{"id":"quarter","type":"text"},{"id":"volume_of_mobile_data","type":"numeric"}]
      * total : 59

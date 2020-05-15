@@ -11,7 +11,10 @@ import dagger.Component
 @ActivityScope
 @Component(modules = [HomeModule::class], dependencies = [AppComponent::class])
 interface HomeComponent {
+
     fun inject(mainActivity: MainActivity)
+
+    fun iHomeView() : HomeView
 
     @Component.Builder
     interface Builder {

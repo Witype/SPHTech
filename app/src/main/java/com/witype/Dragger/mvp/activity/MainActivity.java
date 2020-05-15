@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 import com.witype.Dragger.R;
+import com.witype.Dragger.di.component.DaggerHomeComponent;
 import com.witype.Dragger.mvp.BaseActivity;
 import com.witype.Dragger.mvp.contract.HomeView;
 import com.witype.Dragger.mvp.present.HomePresenter;
@@ -35,7 +36,7 @@ public class MainActivity extends BaseActivity<HomePresenter> implements HomeVie
 
     @Override
     protected void setupComponent(@NonNull AppComponent appComponent) {
-//        DaggerHomeComponent.builder().view(this).appComponent(appComponent).build().inject(this);
+        DaggerHomeComponent.builder().view(this).appComponent(appComponent).build().inject(this);
     }
 
     @Override

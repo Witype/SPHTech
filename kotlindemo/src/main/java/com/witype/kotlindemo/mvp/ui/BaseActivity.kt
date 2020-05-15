@@ -2,6 +2,7 @@ package com.witype.kotlindemo.mvp.ui
 
 import android.app.Activity
 import android.os.Bundle
+import android.widget.Toast
 import butterknife.ButterKnife
 import butterknife.Unbinder
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
@@ -39,7 +40,9 @@ abstract class BaseActivity<P : IBasePresenter> : RxAppCompatActivity(), IBaseVi
 
     protected abstract fun setupComponent(appComponent: AppComponent)
 
-    override fun showToast(message: String) {}
+    override fun showToast(message: String) {
+        Toast.makeText(this,message,Toast.LENGTH_LONG).show()
+    }
 
     override fun showLoading(message: String) {}
 

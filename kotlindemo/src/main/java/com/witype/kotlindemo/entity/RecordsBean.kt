@@ -10,30 +10,20 @@ class RecordsBean : CompareAble {
      */
     var quarterQuaterNum = 0
         get() {
-            try {
-                if (quarter != null && !quarter!!.isEmpty()) {
-                    val pattern = Pattern.compile("Q[0-4]{1}")
-                    val matcher = pattern.matcher(quarter)
-                    val result = if (matcher.find()) matcher.group(0).replace("Q", "0") else "0"
-                    field = Integer.parseInt(result)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            if (quarter != null && quarter!!.isNotEmpty()) {
+                val pattern = Pattern.compile("Q[0-4]{1}")
+                val matcher = pattern.matcher(quarter)
+                field = (if (matcher.find()) matcher.group(0)?.replace("Q", "0") else "0")?.toInt() ?: 0
             }
             return field
         }
         private set
     var quarterYearNum = 0
         get() {
-            try {
-                if (quarter != null && !quarter!!.isEmpty()) {
-                    val pattern = Pattern.compile("[0-9]{3,4}")
-                    val matcher = pattern.matcher(quarter)
-                    val result = if (matcher.find()) matcher.group(0) else "0"
-                    field = Integer.parseInt(result)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            if (quarter != null && quarter!!.isNotEmpty()) {
+                val pattern = Pattern.compile("[0-9]{3,4}")
+                val matcher = pattern.matcher(quarter)
+                field = (if (matcher.find()) matcher.group(0) else "0").toInt()
             }
             return field
         }

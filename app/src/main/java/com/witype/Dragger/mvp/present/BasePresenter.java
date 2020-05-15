@@ -31,7 +31,7 @@ public class BasePresenter<V> implements IBasePresenter, IBaseView {
 
     private UIObservableTransformer observableTransformer;
 
-//    @Inject
+    @Inject
     HttpModel model;
 
     public BasePresenter(V view) {

@@ -1,7 +1,5 @@
 package com.witype.Dragger.app;
 
-import android.app.Application;
-
 import com.witype.Dragger.BuildConfig;
 import com.witype.mvp.app.MApplication;
 import com.witype.mvp.di.module.ConfigModule;
@@ -9,7 +7,6 @@ import com.witype.mvp.di.module.ConfigModule;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.HttpUrl;

@@ -13,7 +13,6 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.witype.kotlindemo.R
 import com.witype.kotlindemo.entity.RecordsBean
-import kotlin.collections.ArrayList
 
 /**
  * Created by WiType on 2020/5/5.
@@ -21,7 +20,8 @@ import kotlin.collections.ArrayList
  * Desc:
  */
 class QuarterAdapter() : RecyclerView.Adapter<QuarterAdapter.DataUsageHolder>() {
-    lateinit var recordsBeans: MutableList<RecordsBean>
+
+    var recordsBeans: MutableList<RecordsBean>
 
     init {
         recordsBeans = ArrayList();
@@ -45,11 +45,11 @@ class QuarterAdapter() : RecyclerView.Adapter<QuarterAdapter.DataUsageHolder>() 
         val recordsBean = getItem(position)
         val context = holder.content.context
         if (recordsBean != null) {
-            holder.year.text = java.lang.String.valueOf(recordsBean.quarterYearNum)
-            holder.quarterTotal.text = String.format(context.getString(R.string.label_tip_total_of_year), java.lang.String.valueOf(recordsBean.total_of_year))
+            holder.year.text = recordsBean.quarterYearNum.toString()
+            holder.quarterTotal.text = String.format(context.getString(R.string.label_tip_total_of_year), recordsBean.total_of_year.toFloat().toString())
             holder.quarter.text = String.format("Q%s", recordsBean.quarterQuaterNum)
-            holder.relative.text = String.format(context.getString(R.string.label_increase), java.lang.String.valueOf(recordsBean.volume_offset))
-            holder.usage.text = java.lang.String.valueOf(recordsBean.volume_of_mobile_data)
+            holder.relative.text = String.format(context.getString(R.string.label_increase), recordsBean.volume_offset.toFloat().toString())
+            holder.usage.text = recordsBean.volume_of_mobile_data.toString()
             holder.view.visibility = if (recordsBean.volume_offset < 0) View.VISIBLE else View.INVISIBLE
             holder.content.visibility = if (isFirstQuarterOfYear(recordsBean.quarterQuaterNum)) View.VISIBLE else View.GONE
             if (recordsBean.volume_offset < 0) {
@@ -61,11 +61,11 @@ class QuarterAdapter() : RecyclerView.Adapter<QuarterAdapter.DataUsageHolder>() 
     }
 
     override fun getItemCount(): Int {
-        return if (recordsBeans == null) 0 else recordsBeans!!.size
+        return recordsBeans.size
     }
 
     fun getItem(position: Int): RecordsBean? {
-        return if (recordsBeans == null || recordsBeans!!.size < position) null else recordsBeans!![position]
+        return if (recordsBeans.size < position) null else recordsBeans[position]
     }
 
     private fun isFirstQuarterOfYear(recordsBean: Int): Boolean {
@@ -99,8 +99,4 @@ class QuarterAdapter() : RecyclerView.Adapter<QuarterAdapter.DataUsageHolder>() 
         }
     }
 
-    companion object {
-        const val TYPE_NORMAL = View.GONE
-        const val TYPE_WITH_TITLE = View.VISIBLE
-    }
 }

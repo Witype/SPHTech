@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 如果接口需要被缓存，则需要在这里定义接口，
+ * when api need cache feature,you can define api hear,
+ * all input must be [Observable],
  * Created by WiType on 2020/5/5.
  * Email witype716@gmail.com
  * Desc:

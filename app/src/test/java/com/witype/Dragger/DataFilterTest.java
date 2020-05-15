@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Action;
@@ -152,25 +150,22 @@ public class DataFilterTest {
                     }
                 })
                 .flatMap(new HomePresenter.DataGroupFun())
-                .flatMap(new Function<List<RecordsBean>, ObservableSource<RecordsBean>>() {
-                    @Override
-                    public ObservableSource<RecordsBean> apply(List<RecordsBean> recordsBeans) throws Exception {
-                        log("|\t");
-                        log(String.format("|\t┌─── item %s ──────────────────────────────────────────────────", recordsBeans.size()));
-                        return Observable.fromIterable(recordsBeans)
-                                .doOnNext(new Consumer<RecordsBean>() {
-                                    @Override
-                                    public void accept(RecordsBean recordsBean) throws Exception {
-                                        log(String.format("|\t| %s", recordsBean.toString()));
-                                    }
-                                })
-                                .doOnComplete(new Action() {
-                                    @Override
-                                    public void run() throws Exception {
-                                        log("|\t└───────────────────────────────────────────────────────────");
-                                    }
-                                });
-                    }
+                .flatMap((Function<List<RecordsBean>, ObservableSource<RecordsBean>>) recordsBeans -> {
+                    log("|\t");
+                    log(String.format("|\t┌─── item %s ──────────────────────────────────────────────────", recordsBeans.size()));
+                    return Observable.fromIterable(recordsBeans)
+                            .doOnNext(new Consumer<RecordsBean>() {
+                                @Override
+                                public void accept(RecordsBean recordsBean) throws Exception {
+                                    log(String.format("|\t| %s", recordsBean.toString()));
+                                }
+                            })
+                            .doOnComplete(new Action() {
+                                @Override
+                                public void run() throws Exception {
+                                    log("|\t└───────────────────────────────────────────────────────────");
+                                }
+                            });
                 })
                 .scan(new BiFunction<RecordsBean, RecordsBean, RecordsBean>() {
                     @Override
