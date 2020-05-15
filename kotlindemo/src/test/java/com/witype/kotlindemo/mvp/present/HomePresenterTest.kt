@@ -190,8 +190,8 @@ class HomePresenterTest {
         log("|\t▊ assert call order showLoading => onGetMobileDataUsage => dismissLoading")
         verifySequence {
             showLoading.showLoading()
-            onGetMobileDataUsage.onGetMobileDataUsage()
             showLoading.dismissLoading()
+            onGetMobileDataUsage.onGetMobileDataUsage()
         }
 
         log("└─── TEST PASS ──────────────────────────────────────────────────")
@@ -264,8 +264,8 @@ class HomePresenterTest {
         log("|\t▊ assert call order showLoading => onGetDataError => dismissLoading")
         verifySequence {
             showLoading.showLoading()
-            onGetDataError.onGetDataError(any())
             showLoading.dismissLoading()
+            onGetDataError.onGetDataError(any())
         }
         log("└─── TEST PASS ──────────────────────────────────────────────────")
     }
@@ -355,8 +355,8 @@ class HomePresenterTest {
         log("|\t▊ assert call order showLoading => onGetMobileDataUsage => dismissLoading")
         verifySequence {
             showLoading.showLoading()
-            onGetMobileDataUsage.onGetMobileDataUsage()
             showLoading.dismissLoading()
+            onGetMobileDataUsage.onGetMobileDataUsage()
         }
 
         log("|\t*** DataRangeFilter 、DataGroupFun、DataQuarterOffsetFun testcase see DataFilterTest ***")
