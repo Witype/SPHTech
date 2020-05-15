@@ -1,0 +1,67 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //dagger
+    api 'com.google.dagger:dagger-android:2.27'
+    api 'com.google.dagger:dagger-android-support:2.27'
+    kapt 'com.google.dagger:dagger-compiler:2.27' // Dagger 2 注解处理
+    kapt 'com.google.dagger:dagger-android-processor:2.27' // Dagger 2 注解处理 Android 支持
+
+    //http request
+    api 'com.squareup.retrofit2:retrofit:2.8.1'
+    api('com.squareup.retrofit2:adapter-rxjava2:2.8.1') {
+        exclude group: "com.squareup.retrofit2"
+        exclude group: "io.reactivex"
+    }
+    api ('com.squareup.retrofit2:converter-gson:2.8.1') {
+        exclude group: "com.squareup.retrofit2"
+        exclude group: "io.reactivex"
+    }
+    api 'com.github.VictorAlbertos.Jolyglot:gson:0.0.4'
+
+    api "com.github.VictorAlbertos.RxCache:runtime:1.8.3-2.x"
+
+    //lifecycle @see https://github.com/trello/RxLifecycle
+    api('com.trello.rxlifecycle3:rxlifecycle-components:3.1.0') {
+        exclude group: "io.reactivex.rxjava2"
+    }
+    //RxJava @see https://github.com/ReactiveX/RxAndroid/tree/2.x
+    api 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    api 'io.reactivex.rxjava2:rxjava:2.2.19'
+
+    api 'com.jakewharton.timber:timber:4.7.1'
+}

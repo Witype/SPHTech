@@ -1,7 +1,5 @@
 package com.witype.Dragger.entity;
 
-import android.text.TextUtils;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,8 +11,8 @@ public class RecordsBean implements CompareAble {
      * _id : 1
      */
 
-    private String quarterQStr;
-    private String quarterYStr;
+    private int quarterQuaterNum = 0;
+    private int quarterYearNum = 0;
     private String quarter;
     private double volume_of_mobile_data;
     private double volume;
@@ -70,36 +68,44 @@ public class RecordsBean implements CompareAble {
         this.total_of_year = total_of_year;
     }
 
-    public String getQuarterQStr() {
-        if (TextUtils.isEmpty(quarterQStr)) {
-            Pattern pattern = Pattern.compile("Q[0-4]{1}");
-            Matcher matcher = pattern.matcher(getQuarter());
-            quarterQStr = matcher.find() ? matcher.group(0) : "";
+    public int getQuarterQuaterNum() {
+        try {
+            if (getQuarter() != null && !getQuarter().isEmpty()) {
+                Pattern pattern = Pattern.compile("Q[0-4]{1}");
+                Matcher matcher = pattern.matcher(getQuarter());
+                quarterQuaterNum = Integer.parseInt(matcher.find() ? matcher.group(0).replace("Q", "0") : "0");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return quarterQStr;
+        return quarterQuaterNum;
     }
 
-    public String getQuarterYStr() {
-        if (TextUtils.isEmpty(quarterYStr)) {
-            Pattern pattern = Pattern.compile("[0-9]{4}");
-            Matcher matcher = pattern.matcher(getQuarter());
-            quarterYStr = matcher.find() ? matcher.group(0) : "";
+    public int getQuarterYearNum() {
+        try {
+            if (getQuarter() != null && !getQuarter().isEmpty()) {
+                Pattern pattern = Pattern.compile("[0-9]{3,4}");
+                Matcher matcher = pattern.matcher(getQuarter());
+                quarterYearNum = Integer.parseInt(matcher.find() ? matcher.group(0) : "0");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return quarterYStr;
+        return quarterYearNum;
     }
 
     @Override
-    public String getCompareKey() {
-        return String.valueOf(get_id());
+    public int getCompareKey() {
+        return Integer.parseInt(String.format("%s%s",getQuarterYearNum() , getQuarterQuaterNum()));
     }
 
     @Override
     public String toString() {
         return "RecordsBean{" +
-                "quarter='" + quarter + '\'' +
-                ", volume_of_mobile_data=" + volume_of_mobile_data +
-                ", _id=" + _id +
-                ", volume_offset=" + volume_offset +
+                "quarter='" + getQuarter() + '\'' +
+                ", volume_of_mobile_data=" + getVolume_of_mobile_data() +
+                ", _id=" + get_id() +
+                ", volume_offset=" + getVolume_offset() +
                 ", total_of_year=" + getTotal_of_year() +
                 '}';
     }

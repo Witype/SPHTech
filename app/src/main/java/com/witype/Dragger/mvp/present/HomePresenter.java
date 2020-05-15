@@ -4,15 +4,14 @@ import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.witype.Dragger.entity.MobileDateUsageEntity;
 import com.witype.Dragger.entity.RecordsBean;
 import com.witype.Dragger.integration.HttpObserver;
-import com.witype.Dragger.integration.scope.ActivityScope;
 import com.witype.Dragger.mvp.activity.QuarterAdapter;
 import com.witype.Dragger.mvp.contract.HomeView;
+import com.witype.mvp.integration.scope.ActivityScope;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -52,7 +51,7 @@ public class HomePresenter extends BasePresenter<HomeView> {
     }
 
     public void getMobileDataUsage(int limit) {
-        model.getMobileDataUsage(RESOURCE_ID, limit)
+        getModel().getMobileDataUsage(RESOURCE_ID, limit)
                 //需要和ActivityEvent绑定，这样在Activity销毁时能够取消订阅
                 .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -64,7 +63,8 @@ public class HomePresenter extends BasePresenter<HomeView> {
                         return mobileDateUsageEntity.getResult().getRecords();
                     }
                 })
-                .flatMap(new DataGroupFun(startQuarter, endQuarter))
+                .flatMap(new DataRangeFilter(startQuarter, endQuarter))
+                .flatMap(new DataGroupFun())
                 .flatMap(new DataQuarterOffsetFun())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new HttpObserver<List<RecordsBean>>() {
@@ -76,7 +76,7 @@ public class HomePresenter extends BasePresenter<HomeView> {
                     @Override
                     public void onHttpError(String message, int httpCode) {
                         super.onHttpError(message, httpCode);
-                        view.onGetDataError(message);
+                        getView().onGetDataError(message);
                     }
 
                     @Override
@@ -88,43 +88,52 @@ public class HomePresenter extends BasePresenter<HomeView> {
     }
 
     /**
-     * 将数据按照年进行分组，
-     * 使用RxJava
-     * groupBy      @see #http://reactivex.io/documentation/operators/groupby.html
-     * toSortedList @see #http://reactivex.io/documentation/operators/to.html
-     * flatMap      @see #http://reactivex.io/documentation/operators/flatmap.html
+     * 通过年份过滤数据
+     * 从startAt—>endAt
      */
-    public static class DataGroupFun implements Function<List<RecordsBean>, ObservableSource<List<RecordsBean>>> {
+    public static class DataRangeFilter implements Function<List<RecordsBean>, ObservableSource<List<RecordsBean>>> {
 
         private int startAt, endAt;
 
-        public DataGroupFun(int startAt, int endAt) {
-            this.startAt = startAt;
-            this.endAt = endAt;
+        public DataRangeFilter(int startAt, int endAt) {
+            this.startAt = Math.min(startAt,endAt);
+            this.endAt = Math.max(endAt,startAt);
         }
 
         @Override
         public ObservableSource<List<RecordsBean>> apply(List<RecordsBean> recordsBeans) throws Exception {
             return Observable.fromIterable(recordsBeans)
-                    .toSortedList(sortListFun)
-                    .toObservable()
-                    .flatMap(new Function<List<RecordsBean>, ObservableSource<RecordsBean>>() {
-                        @Override
-                        public ObservableSource<RecordsBean> apply(List<RecordsBean> recordsBeans) throws Exception {
-                            return Observable.fromIterable(recordsBeans);
-                        }
-                    })
                     .filter(new Predicate<RecordsBean>() {
                         @Override
                         public boolean test(RecordsBean recordsBean) throws Exception {
-                            int quarterFilter = getQuarterFilter(recordsBean.getQuarter());
+                            int quarterFilter = recordsBean.getQuarterYearNum();
                             return quarterFilter >= startAt && quarterFilter <= endAt;
                         }
                     })
+                    .toList()
+                    .toObservable();
+        }
+    }
+
+    /**
+     * 将数据按照年进行排序和分组
+     * step 1： 对数据按照年份进行分组；
+     * step 2： 对分组的数据进行排序，去list[0]的数据，ps：通过分组的数据不会为空，
+     * step 3： 对整个List<List>分组数据进行排序；
+     * 使用RxJava
+     * {@link Observable#groupBy(Function)}     @see #http://reactivex.io/documentation/operators/groupby.html
+     * {@link Observable#toSortedList()}        @see #http://reactivex.io/documentation/operators/to.html
+     * {@link Observable#flatMap(Function)}     @see #http://reactivex.io/documentation/operators/flatmap.html
+     */
+    public static class DataGroupFun implements Function<List<RecordsBean>, ObservableSource<List<RecordsBean>>> {
+
+        @Override
+        public ObservableSource<List<RecordsBean>> apply(List<RecordsBean> recordsBeans) throws Exception {
+            return Observable.fromIterable(recordsBeans)
                     .groupBy(new Function<RecordsBean, Integer>() {
                         @Override
                         public Integer apply(RecordsBean recordsBean) throws Exception {
-                            return getQuarterFilter(recordsBean.getQuarter());
+                            return recordsBean.getQuarterYearNum();
                         }
                     })
                     .flatMap(new Function<GroupedObservable<Integer, RecordsBean>, ObservableSource<List<RecordsBean>>>() {
@@ -143,12 +152,22 @@ public class HomePresenter extends BasePresenter<HomeView> {
                     .flatMap(new Function<List<List<RecordsBean>>, ObservableSource<List<RecordsBean>>>() {
                         @Override
                         public ObservableSource<List<RecordsBean>> apply(List<List<RecordsBean>> lists) throws Exception {
-                            return Observable.fromIterable(lists);
+                            return Observable.fromIterable(lists)
+                                    .window(1)
+                                    .flatMap(new Function<Observable<List<RecordsBean>>, ObservableSource<List<RecordsBean>>>() {
+                                        @Override
+                                        public ObservableSource<List<RecordsBean>> apply(Observable<List<RecordsBean>> listObservable) throws Exception {
+                                            return listObservable;
+                                        }
+                                    });
                         }
                     });
 
         }
 
+        /**
+         * 对分组出来的数据进行排序
+         */
         private Comparator<RecordsBean> sortListFun = new Comparator<RecordsBean>() {
 
             @Override
@@ -157,15 +176,16 @@ public class HomePresenter extends BasePresenter<HomeView> {
             }
         };
 
-        private int getQuarterFilter(String quarter) {
-            Pattern pattern = Pattern.compile("20[0-9]{2}");
-            Matcher matcher = pattern.matcher(quarter);
-            return matcher.find() ? Integer.parseInt(matcher.group(0)) : 0;
-        }
     }
 
+    /**
+     * 排序的执行方法
+     * @param recordsBean
+     * @param t1
+     * @return
+     */
     private static int ascCompare(RecordsBean recordsBean, RecordsBean t1) {
-        return recordsBean.getCompareKey().compareTo(t1.getCompareKey());
+        return recordsBean.getCompareKey() - t1.getCompareKey();
     }
 
     /**
@@ -176,6 +196,7 @@ public class HomePresenter extends BasePresenter<HomeView> {
 
         private BigDecimal total;
 
+
         @Override
         public ObservableSource<List<RecordsBean>> apply(List<RecordsBean> recordsBeans) throws Exception {
             total = new BigDecimal(0.0);
@@ -183,8 +204,8 @@ public class HomePresenter extends BasePresenter<HomeView> {
                     .doOnNext(new Consumer<RecordsBean>() {
                         @Override
                         public void accept(RecordsBean recordsBean) throws Exception {
-                            recordsBean.getQuarterQStr();
-                            recordsBean.getQuarterYStr();
+                            recordsBean.getQuarterQuaterNum();
+                            recordsBean.getQuarterYearNum();
                             total = total.add(new BigDecimal(recordsBean.getVolume_of_mobile_data()));
                         }
                     })
@@ -193,8 +214,9 @@ public class HomePresenter extends BasePresenter<HomeView> {
                         public RecordsBean apply(RecordsBean recordsBean, RecordsBean recordsBean2) throws Exception {
                             double offset = new BigDecimal(recordsBean2.getVolume_of_mobile_data()).subtract(new BigDecimal(recordsBean.getVolume_of_mobile_data())).doubleValue();
                             recordsBean2.setVolume_offset(offset);
-//                            double result = new BigDecimal(Double.toString(recordsBean.getVolume_of_mobile_data())).add(new BigDecimal(recordsBean2.getVolume_of_mobile_data())).doubleValue();
-//                            recordsBean2.setVolume(result);
+//                            BigDecimal add = new BigDecimal(recordsBean.getTotal_of_year()).add(new BigDecimal(recordsBean2.getTotal_of_year()));
+//                            recordsBean.setTotal_of_year(add.floatValue());
+//                            recordsBean2.setTotal_of_year(add.floatValue());
                             return recordsBean2;
                         }
                     })

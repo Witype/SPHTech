@@ -4,15 +4,17 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
-import com.witype.Dragger.app.MApplication;
-import com.witype.Dragger.di.component.AppComponent;
+import com.witype.Dragger.app.JavaDemoApplication;
 import com.witype.Dragger.mvp.contract.IBaseView;
 import com.witype.Dragger.mvp.present.IBasePresenter;
+import com.witype.mvp.di.component.AppComponent;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -26,7 +28,7 @@ public abstract class BaseActivity<P extends IBasePresenter> extends RxAppCompat
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupComponent(((MApplication) getApplication()).getAppComponent());
+        setupComponent(((JavaDemoApplication) getApplication()).getAppComponent());
         setContentView(getResId());
         initView();
         if (presenter != null) {
@@ -36,6 +38,12 @@ public abstract class BaseActivity<P extends IBasePresenter> extends RxAppCompat
     }
 
     public abstract int getResId();
+
+    @NonNull
+    @Override
+    public Lifecycle getLifecycle() {
+        return super.getLifecycle();
+    }
 
     public void initView() {
         bind = ButterKnife.bind(this);

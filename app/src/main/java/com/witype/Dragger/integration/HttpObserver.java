@@ -35,10 +35,17 @@ public abstract class HttpObserver<T> implements Observer<T> {
     @Override
     public void onNext(@Nullable T t) {
         Timber.tag(TAG).i("onNext : %s" , t == null ? "null" : t.toString());
-        onSuccess(t);
+        if (t == null) {
+            throw new IllegalArgumentException("response empty");
+        }
+        try {
+            onSuccess(t);
+        } catch (Exception e) {
+            onError(e);
+        }
     }
 
-    public abstract void onSuccess(T t);
+    public abstract void onSuccess(T t) throws Exception;
 
     public void onNetworkError(Throwable t) {
         Timber.tag(TAG).i("onNetworkError : %s" , t == null ? "null" : t.toString());
@@ -60,7 +67,6 @@ public abstract class HttpObserver<T> implements Observer<T> {
     @Override
     public void onError(Throwable e) {
         Timber.tag(TAG).i("onError : %s" , e.getMessage());
-        e.printStackTrace();
         if (e instanceof CompositeException) {
             CompositeException exception = (CompositeException) e;
             List<Throwable> exceptions = exception.getExceptions();
@@ -78,13 +84,15 @@ public abstract class HttpObserver<T> implements Observer<T> {
         if (e instanceof SocketTimeoutException ||
                 e instanceof ConnectException ||
                 e instanceof UnknownHostException) {
-            onHttpError("网络错误",-1);
+            onNetworkError(e);
         } else if (e instanceof HttpException) {
             HttpException exception = (HttpException) e;
             onHttpError(convertStatusCode(exception),exception.code());
         } else if (e instanceof ResponseException) {
             ResponseException exception = (ResponseException) e;
             onResponseError(exception.getMessage(),exception.getCode());
+        } else {
+            onResponseError(e.getMessage(),-1);
         }
     }
 

@@ -56,7 +56,7 @@ public class ResultBean {
                 "total=" + total +
                 ", resource_id='" + resource_id + '\'' +
                 ", limit=" + limit +
-                ", records=" + records.toString() +
+                ", records=" + (records == null ? 0 : records.size()) +
                 '}';
     }
 }

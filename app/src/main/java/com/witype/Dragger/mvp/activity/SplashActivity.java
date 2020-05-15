@@ -3,8 +3,8 @@ package com.witype.Dragger.mvp.activity;
 import android.content.Intent;
 
 import com.witype.Dragger.R;
-import com.witype.Dragger.di.component.AppComponent;
 import com.witype.Dragger.mvp.BaseActivity;
+import com.witype.mvp.di.component.AppComponent;
 
 import java.util.concurrent.TimeUnit;
 

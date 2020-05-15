@@ -1,10 +1,7 @@
 package com.witype.Dragger.di.module;
 
-import com.witype.Dragger.integration.CallDataModel;
-import com.witype.Dragger.integration.scope.ActivityScope;
 import com.witype.Dragger.mvp.activity.QuarterAdapter;
-
-import javax.inject.Singleton;
+import com.witype.mvp.integration.scope.ActivityScope;
 
 import dagger.Module;
 import dagger.Provides;

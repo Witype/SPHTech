@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="content_marge">16dp</dimen>
+    <dimen name="item_marge">8dp</dimen>
+    <dimen name="item_marge_small">4dp</dimen>
+    <dimen name="item_home_margin_start">16dp</dimen>
+    <dimen name="item_home_quarter_title_height">24dp</dimen>
+
+    <dimen name="text_size_item_year">24sp</dimen>
+    <dimen name="text_size_item_sub_title">18sp</dimen>
+    <dimen name="text_size_quarter_primary">32sp</dimen>
+    <dimen name="text_size_quarter_secondary">16sp</dimen>
+
+    <dimen name="divider_height">1px</dimen>
+</resources>

@@ -8,16 +8,13 @@ import androidx.annotation.Nullable;
 import com.trello.rxlifecycle3.LifecycleTransformer;
 import com.trello.rxlifecycle3.RxLifecycle;
 import com.trello.rxlifecycle3.android.ActivityEvent;
-import com.witype.Dragger.integration.CallDataModel;
+import com.witype.Dragger.integration.HttpModel;
 import com.witype.Dragger.integration.UIObservableTransformer;
 import com.witype.Dragger.mvp.contract.IBaseView;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
@@ -35,15 +32,24 @@ public class BasePresenter<V> implements IBasePresenter, IBaseView {
     private UIObservableTransformer observableTransformer;
 
     @Inject
-    CallDataModel model;
+    HttpModel model;
 
     public BasePresenter(V view) {
         this.view = view;
     }
 
+    public V getView() {
+        return view;
+    }
+
+    public HttpModel getModel() {
+        return model;
+    }
+
     public final <T> LifecycleTransformer<T> bindUntilEvent(@NonNull ActivityEvent event) {
         Timber.tag(TAG).i("bindUntilEvent : %s", event.toString());
-        return RxLifecycle.bindUntilEvent(lifecycleSubject, event);
+        LifecycleTransformer<T> objectLifecycleTransformer = RxLifecycle.bindUntilEvent(lifecycleSubject, event);
+        return objectLifecycleTransformer;
     }
 
     public final <T> ObservableTransformer<T, T> bindUIEvent() {
@@ -66,6 +72,7 @@ public class BasePresenter<V> implements IBasePresenter, IBaseView {
     @Override
     public void onStart() {
         Timber.tag(TAG).i("onStart");
+        lifecycleSubject.onNext(ActivityEvent.START);
     }
 
     @Override

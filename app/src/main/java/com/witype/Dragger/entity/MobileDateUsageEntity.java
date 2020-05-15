@@ -36,4 +36,13 @@ public class MobileDateUsageEntity {
     public void setSuccess(boolean success) {
         this.success = success;
     }
+
+    @Override
+    public String toString() {
+        return "MobileDateUsageEntity{" +
+                "help='" + help + '\'' +
+                ", result=" + result +
+                ", success=" + success +
+                '}';
+    }
 }
