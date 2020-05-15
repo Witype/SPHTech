@@ -4,7 +4,7 @@
 - 支持数据本地缓存
 
 
-![image](https://j1-media.s3.cn-north-1.amazonaws.com.cn/resource/2020/05-15/ebedc1c3d6bbe67b646b73cb544d2987.gif)
+![image](https://github.com/Witype/SPHTech/blob/master/demo.gif)
 
 ## 功能和依赖库
 1. [`RxJava2`](https://github.com/ReactiveX/RxJava)
