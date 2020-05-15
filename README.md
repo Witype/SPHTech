@@ -3,6 +3,9 @@
 - 如果一年中任何一个季度的数据量下降，则在条目中显示一个可点击的图像，点击后显示数据对话框；
 - 支持数据本地缓存
 
+
+![image](https://j1-media.s3.cn-north-1.amazonaws.com.cn/resource/2020/05-15/ebedc1c3d6bbe67b646b73cb544d2987.gif)
+
 ## 功能和依赖库
 1. [`RxJava2`](https://github.com/ReactiveX/RxJava)
 2. [`RxAndroid2`](https://github.com/ReactiveX/RxAndroid)
