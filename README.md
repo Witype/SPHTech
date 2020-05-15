@@ -6,7 +6,7 @@
 ## 功能和依赖库
 1. [`RxJava2`](https://github.com/ReactiveX/RxJava)
 2. [`RxAndroid2`](https://github.com/ReactiveX/RxAndroid)
-3. [`Mvp` Google's official` Mvp` architecture project (this is the Dagger branch).](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/)
+3. [`Mvp` Google's official` Mvp` Dagger2案例.](https://github.com/googlesamples/android-architecture/tree/todo-mvp-dagger/)
 4. [`Dagger2`](https://github.com/google/dagger)
 5. [`Retrofit`](https://github.com/square/retrofit)
 6. [`Okhttp`](https://github.com/square/okhttp)
@@ -27,7 +27,7 @@
 - [ ] 测试
   - [x] 核心逻辑代码单元测试。ps：各个框架都有相应的单元测试用例，因此第三方库忽略测试
   - [x] UI即兼容测试
-  - [x] 薪资RxJava模块单元测试用例
+  - [x] 新增RxJava模块单元测试用例，（网络错误、服务器内部错误）
   - [ ] 老化测试
 
 ## 特点
