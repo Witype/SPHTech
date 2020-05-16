@@ -187,7 +187,7 @@ class HomePresenterTest {
         verify(exactly = 1) { showLoading.showLoading() }
         verify(exactly = 1) { showLoading.dismissLoading() }
 
-        log("|\t▊ assert call order showLoading => onGetMobileDataUsage => dismissLoading")
+        log("|\t▊ assert call order showLoading => dismissLoading => onGetMobileDataUsage")
         verifySequence {
             showLoading.showLoading()
             showLoading.dismissLoading()
@@ -261,7 +261,7 @@ class HomePresenterTest {
         verify(exactly = 1) { showLoading.showLoading() }
         verify(exactly = 1) { showLoading.dismissLoading() }
 
-        log("|\t▊ assert call order showLoading => onGetDataError => dismissLoading")
+        log("|\t▊ assert call order showLoading => dismissLoading => onGetDataError")
         verifySequence {
             showLoading.showLoading()
             showLoading.dismissLoading()
@@ -352,7 +352,7 @@ class HomePresenterTest {
         verify(exactly = 1) { showLoading.showLoading() }
         verify(exactly = 1) { showLoading.dismissLoading() }
 
-        log("|\t▊ assert call order showLoading => onGetMobileDataUsage => dismissLoading")
+        log("|\t▊ assert call order showLoading => dismissLoading => onGetMobileDataUsage ")
         verifySequence {
             showLoading.showLoading()
             showLoading.dismissLoading()
